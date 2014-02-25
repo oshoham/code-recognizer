@@ -28,12 +28,15 @@ def remove_unwanted_files(args, directory, files):
             else:
                 return_code = call(['mv', os.path.join(directory, f), destination_directory])
 
-def main(languages = {'c', 'java', 'python', 'js', 'haskell'}):
+def get_code(languages = {'c', 'java', 'python', 'js', 'haskell'}):
     file_extensions = {'haskell':'.hs', 'java':'.java', 'c':'.c', 'js':'.js', 'python':'.py'}
     for language in languages:
         if language not in file_extensions:
             print '{} is not a recognized language.'.format(language)
-            exit()
+            languages.remove(language)
+    if len(languages) == 0:
+        print 'None of the specified languages were recognized.'
+        exit()
 
     print 'Enter your GitHub login credentials.'
     username = raw_input('username: ')
@@ -44,7 +47,6 @@ def main(languages = {'c', 'java', 'python', 'js', 'haskell'}):
 
     search_string = 'https://api.github.com/search/repositories?q=language:'
     sorting_options = '&sort:stars'
-    #languages = {'c', 'java', 'python', 'js', 'haskell'}
 
     code_samples_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "code_samples")
     if os.path.isdir(code_samples_directory):
@@ -91,6 +93,6 @@ if __name__ == '__main__':
     if(len(sys.argv) > 1):
         for i in xrange(1, len(sys.argv)):
             languages.add(sys.argv[1])
-        main(languages)
+        get_code(languages)
     else:
-        main()
+        get_code()
