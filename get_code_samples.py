@@ -4,7 +4,13 @@ from getpass import getpass
 
 def check_rate_limit(num_requests, username, password):
     rate_limit_req = requests.get('https://api.github.com/rate_limit', auth = (username, password))
-    rate_limit = rate_limit_req.json()['resources']['search']
+    rate_limit_data = rate_limit_req.json()
+    
+    if 'message' in rate_limit_data:
+        print 'Error communicating with GitHub: {}.'.format(rate_limit_data['message'])
+        exit()
+
+    rate_limit = rate_limit_data['resources']['search']
     remaining_requests = rate_limit['remaining']
     reset_time = int(rate_limit['reset']-time.time())
 
@@ -48,6 +54,9 @@ def get_code(languages = {'c', 'java', 'python', 'js', 'haskell'}):
     search_string = 'https://api.github.com/search/repositories?q=language:'
     sorting_options = '&sort:stars'
 
+    print 'Checking GitHub search API rate limit...'
+    check_rate_limit(len(languages), username, password)
+
     code_samples_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "code_samples")
     if os.path.isdir(code_samples_directory):
         overwrite = raw_input('Code samples directory already exists. Overwrite it? (y/n) ')
@@ -59,7 +68,6 @@ def get_code(languages = {'c', 'java', 'python', 'js', 'haskell'}):
         print 'Code samples directory not found. Creating directory at {}...'.format(code_samples_directory)
     os.makedirs(code_samples_directory)
 
-    check_rate_limit(len(languages), username, password)
 
     for language in languages:
         print 'Downloading git repositories containing {} code'.format(language)
