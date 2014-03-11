@@ -52,7 +52,7 @@ def get_code(languages = {'c', 'java', 'python', 'js', 'haskell'}):
     samples_per_language = 5
 
     search_string = 'https://api.github.com/search/repositories?q=language:'
-    sorting_options = '&sort:stars'
+    sorting_options = '+sort:stars+size:<5000'
 
     print 'Checking GitHub search API rate limit...'
     check_rate_limit(len(languages), username, password)
